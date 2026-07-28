@@ -11,6 +11,8 @@ from backend.app.models.base import Base
 from backend.app.models.user import User  # Must be imported to register table metadata
 from backend.app.models.project import Project, ProjectRequirement, ProjectFile, ProjectActivity
 from backend.app.models.agent import Agent, AgentDepartment, AgentSkill, AgentCapability, AgentMemory, AgentConversation, AgentMessage
+from backend.app.models.workflow import Workflow, WorkflowStage, WorkflowTask, WorkflowExecution
+
 
 
 

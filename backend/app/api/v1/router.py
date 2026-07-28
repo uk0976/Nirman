@@ -7,9 +7,9 @@ from backend.app.api.v1.agents.agents_router import (
     departments_router,
     skills_router
 )
+from backend.app.api.v1.workflows.workflows_router import router as workflows_router
+from backend.app.api.v1.workflows.tasks_router import router as tasks_router
 from backend.app.api.v1.stubs import (
-    tasks_router,
-    workflows_router,
     warroom_router,
     analytics_router,
     deployments_router
@@ -23,13 +23,13 @@ v1_router = APIRouter()
 v1_router.include_router(auth_router)
 v1_router.include_router(users_router)
 
-# Register project and agent routers
+# Register project, agent, and workflow routers
 v1_router.include_router(projects_router)
 v1_router.include_router(agents_router)
 v1_router.include_router(departments_router)
 v1_router.include_router(skills_router)
-v1_router.include_router(tasks_router)
 v1_router.include_router(workflows_router)
+v1_router.include_router(tasks_router)
 v1_router.include_router(warroom_router)
 v1_router.include_router(analytics_router)
 v1_router.include_router(deployments_router)
