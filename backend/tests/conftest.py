@@ -30,7 +30,7 @@ def anyio_backend() -> str:
     return "asyncio"
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(scope="function")
 async def setup_db() -> AsyncGenerator[None, None]:
     """
     Initializes and wipes schema structures before/after each unit test context.
@@ -43,7 +43,7 @@ async def setup_db() -> AsyncGenerator[None, None]:
 
 
 @pytest.fixture(scope="function")
-async def db_session() -> AsyncGenerator[AsyncSession, None]:
+async def db_session(setup_db) -> AsyncGenerator[AsyncSession, None]:
     """
     Provides a separate async session bound to the active test database.
     """
