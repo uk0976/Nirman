@@ -60,10 +60,11 @@ async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     Yields an HTTPX client that overrides the FastAPI `get_db` dependency to use the test database.
     """
     async def _get_test_db():
-        try:
-            yield db_session
-        finally:
-            pass
+        async with TestSessionLocal() as session:
+            try:
+                yield session
+            finally:
+                await session.close()
 
     app.dependency_overrides[get_db] = _get_test_db
     

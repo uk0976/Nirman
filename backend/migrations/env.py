@@ -10,6 +10,8 @@ from backend.app.core.config import settings
 from backend.app.models.base import Base
 from backend.app.models.user import User  # Must be imported to register table metadata
 from backend.app.models.project import Project, ProjectRequirement, ProjectFile, ProjectActivity
+from backend.app.models.agent import Agent, AgentDepartment, AgentSkill, AgentCapability, AgentMemory, AgentConversation, AgentMessage
+
 
 
 # Access the Alembic configuration object

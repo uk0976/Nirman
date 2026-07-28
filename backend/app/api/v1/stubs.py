@@ -28,7 +28,6 @@ def create_stub_router(name: str, tag: str) -> APIRouter:
     return router
 
 # Generate stub routers matching requested folder structure
-agents_router = create_stub_router("agents", "Agents")
 tasks_router = create_stub_router("tasks", "Tasks")
 workflows_router = create_stub_router("workflows", "Workflows")
 warroom_router = create_stub_router("warroom", "War Room")

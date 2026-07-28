@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.core.config import settings
 from backend.app.core.logging import logger
-from backend.app.core.database import engine, get_db
+from backend.app.core.database import engine, get_db, AsyncSessionLocal
 from backend.app.api.v1.router import v1_router
 from backend.app.middleware.logging import RequestLoggingMiddleware
 from backend.app.middleware.security import SecurityHeadersMiddleware
@@ -29,6 +29,17 @@ from backend.app.utils.exceptions import (
 async def lifespan(app: FastAPI):
     # Log system startup details
     logger.info(f"Nirman Backend platform starting up in '{settings.ENVIRONMENT}' environment...")
+    
+    # Auto-seed database metadata and AI agents if empty on boot
+    try:
+        async with AsyncSessionLocal() as session:
+            from backend.app.services.agent_service import AgentService
+            agent_service = AgentService(session)
+            await agent_service.seed_agents_database_if_empty()
+            logger.info("Database startup checks: agents catalog is seeded and healthy.")
+    except Exception as e:
+        logger.error(f"Failed performing database startup seeding: {str(e)}", exc_info=True)
+
     yield
     # Cleanup connection pools on shutdown
     logger.info("Nirman Backend platform shutting down. Closing database pools...")
