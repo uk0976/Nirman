@@ -101,7 +101,7 @@ class OpenAIProvider(LLMProvider):
             # Fallback to mock generation if no live client is present
             if response_schema:
                 return generate_mock_json_from_schema(response_schema)
-            return f"OpenAI mock output response for prompt: {prompt[:50]}..."
+            return f"OpenAI mock output response for prompt: {prompt}"
 
         # Live call execution
         try:

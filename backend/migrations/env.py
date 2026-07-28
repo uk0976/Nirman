@@ -14,6 +14,7 @@ from backend.app.models.agent import Agent, AgentDepartment, AgentSkill, AgentCa
 from backend.app.models.workflow import Workflow, WorkflowStage, WorkflowTask, WorkflowExecution
 from backend.app.models.ai_audit import AIAuditLog
 from backend.app.models.warroom import WarRoomSession, WarRoomParticipant, WarRoomMessage, Decision, Vote
+from backend.app.models.execution import Execution, ExecutionStage, Artifact, Deliverable
 
 
 
