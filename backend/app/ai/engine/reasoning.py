@@ -1,7 +1,9 @@
 import time
+import json
 import uuid
 from typing import Dict, Any, List, Optional, Type
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.ai.providers import OpenAIProvider, ClaudeProvider, GeminiProvider
 from backend.app.ai.validators import (
@@ -13,6 +15,7 @@ from backend.app.ai.telemetry.telemetry import TelemetryTracker
 from backend.app.ai.cost.tracker import CostTracker
 from backend.app.ai.prompts.builder import PromptBuilder
 from backend.app.ai.agents.base import BaseAgent
+from backend.app.schemas.ai import StructuredAIResponse
 
 class ReasoningEngine:
     def __init__(
@@ -45,18 +48,31 @@ class ReasoningEngine:
         validator_types: Optional[List[str]] = None,
         max_retries: int = 3,
         primary_provider: str = "openai",
-        workflow_id: Optional[uuid.UUID] = None
-    ) -> str:
+        workflow_id: Optional[uuid.UUID] = None,
+        task_id: Optional[uuid.UUID] = None,
+        db: Optional[AsyncSession] = None
+    ) -> StructuredAIResponse:
         """
         Coordinates the reasoning loop: selects provider, formats prompts, runs retries on validation errors,
         tracks transaction costs, and fires EventBus events.
         """
+        execution_id = uuid.uuid4()
         wf_id = workflow_id or uuid.uuid4()
         
         # 1. Publish starting events
         self.event_bus.publish("Agent Started", {"agent": agent.role, "task": task_title})
 
-        # 2. Build prompt
+        # 2. Model Routing Configuration
+        # Route to code-capable models if agent belongs to code disciplines
+        model = self.providers["openai"].default_model
+        if agent.role in ["Software Architect", "Frontend Engineer", "Backend Engineer", "Database Engineer", "DevOps Engineer"]:
+            model = self.providers["openai"].code_model
+        
+        provider_name = primary_provider
+        # Fallback to OpenAI default if provider is not registered
+        provider = self.providers.get(provider_name, self.providers["openai"])
+
+        # 3. Build Prompt
         prompt = PromptBuilder.build_prompt(
             system_prompt=agent.get_system_prompt(),
             project_context=context.get("project_name", "Nirman Project"),
@@ -67,21 +83,19 @@ class ReasoningEngine:
         )
         self.event_bus.publish("Prompt Built", {"prompt_length": len(prompt)})
 
-        # 3. Compile Validators
+        # 4. Compile Validators
         validators = self._resolve_validators(validator_types)
         if response_schema and not any(isinstance(v, JSONValidator) for v in validators):
             validators.append(JSONValidator())
 
-        provider_name = primary_provider
         retries = 0
         error_feedback = ""
-
         start_time = time.time()
         output = ""
 
-        # 4. Execution & Validation Loop
+        # 5. Execution & Validation Loop
         while retries <= max_retries:
-            # Fallback policy: if primary provider fails on retry, switch to Claude/Gemini!
+            # Fallback model provider policy on failures
             if retries == 1:
                 provider_name = "claude"
             elif retries == 2:
@@ -99,7 +113,8 @@ class ReasoningEngine:
                 output = await provider.generate(
                     prompt=adjusted_prompt,
                     system_prompt=agent.get_system_prompt(),
-                    response_schema=response_schema
+                    response_schema=response_schema,
+                    config={"model": model}
                 )
 
                 # Validate Output
@@ -111,7 +126,6 @@ class ReasoningEngine:
                 break
 
             except ValueError as e:
-                # Validation error - trigger retry
                 retries += 1
                 error_feedback = str(e)
                 self.event_bus.publish("Reasoning Failed", {"error": error_feedback, "retry": retries})
@@ -128,8 +142,54 @@ class ReasoningEngine:
                     )
                     raise ValueError(f"Failed to obtain valid response after {max_retries} retries. Error: {error_feedback}")
 
-        # 5. Log Telemetry and Cost
         latency_ms = (time.time() - start_time) * 1000
+        
+        # 6. Parse Output Structures
+        output_dict = {}
+        try:
+            output_dict = json.loads(output)
+        except Exception:
+            pass
+
+        status = "success"
+        confidence = 0.95
+        reasoning_summary = "Execution processed and output validated successfully."
+        result = output
+        warnings = []
+        metadata = {}
+
+        if isinstance(output_dict, dict):
+            status = output_dict.get("status", "success")
+            confidence = output_dict.get("confidence", 0.95)
+            reasoning_summary = output_dict.get("reasoning_summary", reasoning_summary)
+            result = str(output_dict.get("result", output))
+            warnings = output_dict.get("warnings", [])
+            metadata = output_dict.get("metadata", {})
+
+        # 7. Orchestrate Tool Execution if requested
+        if isinstance(output_dict, dict) and "tool" in output_dict:
+            tool_name = output_dict["tool"]
+            tool_args = output_dict.get("args", {})
+            
+            # Load Tool Registry
+            from backend.app.ai.registry.tool_registry import DiscoverableToolRegistry
+            tool_registry = DiscoverableToolRegistry()
+            
+            if tool_registry.check_permissions(tool_name, agent.permissions):
+                tool = tool_registry.get_tool(tool_name)
+                if tool:
+                    self.event_bus.publish("Tool Invoked", {"tool": tool_name})
+                    tool_result = await tool.execute(tool_args)
+                    metadata["tool_execution_result"] = tool_result
+            else:
+                warnings.append(f"Agent failed authorization check to execute tool '{tool_name}'")
+
+        # 8. Token Accounting
+        prompt_tokens = len(prompt) // 4
+        completion_tokens = len(output) // 4
+        cost = provider.estimate_cost(prompt_tokens, completion_tokens, model)
+
+        # Log Cost Tracker and Telemetry
         self.telemetry.log_transaction(
             agent_role=agent.role,
             provider=provider_name,
@@ -137,25 +197,60 @@ class ReasoningEngine:
             is_error=False,
             retries=retries
         )
-
-        # Mock token calculations
-        prompt_tokens = len(prompt) // 4
-        completion_tokens = len(output) // 4
-        cost = provider.estimate_cost(prompt_tokens, completion_tokens, provider_name)
-
         self.cost_tracker.record_usage(
             workflow_id=wf_id,
             agent_role=agent.role,
             provider=provider_name,
-            model=provider_name,
+            model=model,
             prompt_tokens=prompt_tokens,
             completion_tokens=completion_tokens,
             estimated_cost=cost,
             execution_time_ms=latency_ms
         )
 
+        structured_response = StructuredAIResponse(
+            status=status,
+            confidence=confidence,
+            reasoning_summary=reasoning_summary,
+            result=result,
+            warnings=warnings,
+            metadata=metadata,
+            usage={
+                "prompt_tokens": prompt_tokens,
+                "completion_tokens": completion_tokens,
+                "total_tokens": prompt_tokens + completion_tokens,
+                "estimated_cost": cost
+            },
+            provider=provider_name,
+            model=model,
+            latency=latency_ms
+        )
+
+        # 9. Database Audit Logging
+        if db:
+            from backend.app.models.ai_audit import AIAuditLog
+            audit = AIAuditLog(
+                workflow_id=wf_id,
+                task_id=task_id,
+                execution_id=execution_id,
+                prompt_version=1,
+                agent_role=agent.role,
+                model=model,
+                provider=provider_name,
+                response_metadata={
+                    "status": status,
+                    "confidence": confidence,
+                    "latency_ms": latency_ms,
+                    "cost": cost,
+                    "prompt_tokens": prompt_tokens,
+                    "completion_tokens": completion_tokens,
+                    "warnings": warnings
+                }
+            )
+            db.add(audit)
+
         self.event_bus.publish("Task Completed", {"agent": agent.role, "cost": cost})
-        return output
+        return structured_response
 
     def _resolve_validators(self, types: Optional[List[str]]) -> List[ResponseValidator]:
         if not types:

@@ -40,6 +40,16 @@ class Settings(BaseSettings):
     # File Upload Directory
     UPLOAD_DIR: str = os.path.join(BASE_DIR, "uploads")
 
+    # OpenAI & Codex configurations
+    OPENAI_API_KEY: str = "mock_key"
+    OPENAI_MODEL: str = "gpt-4o"
+    OPENAI_CODE_MODEL: str = "gpt-4o"
+    OPENAI_BASE_URL: str = "https://api.openai.com/v1"
+    OPENAI_TIMEOUT: float = 30.0
+    OPENAI_MAX_RETRIES: int = 3
+    OPENAI_TEMPERATURE: float = 0.7
+    OPENAI_MAX_OUTPUT_TOKENS: int = 4096
+
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod

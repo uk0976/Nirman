@@ -185,7 +185,7 @@ async def test_reasoning_engine_correctness_and_retries():
     )
 
     # Verify Output conforms to schema
-    parsed = ProjectOutputSchema.model_validate_json(result_str)
+    parsed = ProjectOutputSchema.model_validate_json(result_str.result)
     assert parsed.tables_count == 100
     assert "Mocked" in parsed.database_choice
 
