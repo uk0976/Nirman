@@ -56,6 +56,13 @@ async def rollback_stage(req: StageControlRequest):
         raise HTTPException(status_code=404, detail="Pipeline or stage not found")
     return state
 
+@router.get("/list")
+async def list_pipelines():
+    """
+    Returns all active and completed pipeline states for the current workspace.
+    """
+    return list(pipeline_engine.active_pipelines.values())
+
 @router.get("/status/{pipeline_id}")
 async def get_pipeline_status(pipeline_id: str):
     state = pipeline_engine.get_pipeline_status(pipeline_id)

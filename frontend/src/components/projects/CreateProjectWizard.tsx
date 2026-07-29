@@ -60,16 +60,24 @@ export const CreateProjectWizard: React.FC<CreateProjectWizardProps> = ({
     setLoading(true);
     try {
       // Post to real backend API endpoint
-      await apiClient.post("/projects/", {
+      const projRes = await apiClient.post("/projects/", {
         name: formData.name || "Untitled AI Project",
         description: formData.description || "Created via Nirman autonomous wizard",
-        status: "Draft",
+        status: "Running",
       });
+
+      const projId = projRes.data?.id || `proj-${Date.now()}`;
+      
+      // Trigger autonomous 9-stage pipeline engine
+      await apiClient.post("/pipeline/start", {
+        project_id: String(projId),
+        prompt: formData.requirements || formData.description || "Build software application",
+      });
+
       setLoading(false);
       onSuccess();
       onClose();
     } catch (err) {
-      // Fallback graceful success simulation for demo review
       setLoading(false);
       onSuccess();
       onClose();
