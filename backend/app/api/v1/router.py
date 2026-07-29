@@ -16,6 +16,7 @@ from backend.app.api.v1.orchestrator_router import router as orchestrator_router
 from backend.app.api.v1.github_router import router as github_router
 from backend.app.api.v1.sandbox_router import router as sandbox_router
 from backend.app.api.v1.pipeline_router import router as pipeline_router
+from backend.app.api.v1.qa_security_router import router as qa_security_router
 from backend.app.api.v1.stubs import (
     analytics_router,
     deployments_router
@@ -43,5 +44,6 @@ v1_router.include_router(orchestrator_router)
 v1_router.include_router(github_router)
 v1_router.include_router(sandbox_router)
 v1_router.include_router(pipeline_router)
+v1_router.include_router(qa_security_router)
 v1_router.include_router(analytics_router)
 v1_router.include_router(deployments_router)
