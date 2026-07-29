@@ -144,7 +144,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           
           {/* Logo Branding */}
-          <a href="#" className="flex items-center gap-2 group">
+          <a href="/" className="flex items-center gap-2 group">
             <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-500 bg-clip-text text-transparent">
               निर्माण | Nirman
             </span>
@@ -152,25 +152,22 @@ export default function Home() {
 
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
-            {["Home", "Features", "How it Works", "AI Employees", "Pricing", "FAQ"].map((item) => (
-              <a 
-                key={item} 
-                href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
-                className="hover:text-slate-100 transition-colors relative group py-2"
-              >
-                {item}
-                <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-indigo-500 transition-all group-hover:w-full" />
-              </a>
-            ))}
+            <a href="/dashboard" className="hover:text-slate-100 transition-colors py-2">Dashboard</a>
+            <a href="/warroom" className="hover:text-slate-100 transition-colors py-2">AI War Room</a>
+            <a href="/workflow" className="hover:text-slate-100 transition-colors py-2">Workflow</a>
+            <a href="/projects" className="hover:text-slate-100 transition-colors py-2">Projects</a>
+            <a href="/artifacts" className="hover:text-slate-100 transition-colors py-2">Artifacts</a>
+            <a href="/agents" className="hover:text-slate-100 transition-colors py-2">AI Employees</a>
+            <a href="/settings" className="hover:text-slate-100 transition-colors py-2">Settings</a>
           </nav>
 
           {/* Nav CTAs */}
           <div className="flex items-center gap-4">
-            <a href="#login" className="text-sm font-medium text-slate-400 hover:text-slate-100 transition-colors">
+            <a href="/login" className="text-sm font-medium text-slate-400 hover:text-slate-100 transition-colors">
               Login
             </a>
             <a 
-              href="#get-started" 
+              href="/dashboard" 
               className="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-500 transition-all shadow-[0_0_15px_rgba(99,102,241,0.4)]"
             >
               Get Started
@@ -209,13 +206,13 @@ export default function Home() {
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
             <a 
-              href="#get-started" 
+              href="/dashboard" 
               className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-sm font-semibold rounded-lg shadow-lg shadow-indigo-600/30 hover:opacity-90 transition-all flex items-center justify-center gap-2 group text-white"
             >
               Start Building <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
             <a 
-              href="#watch-demo" 
+              href="/warroom" 
               className="w-full sm:w-auto px-8 py-4 border border-white/10 hover:border-white/20 text-sm font-semibold rounded-lg bg-white/5 transition-all flex items-center justify-center gap-2"
             >
               <Play className="w-4 h-4 fill-white" /> Watch Demo

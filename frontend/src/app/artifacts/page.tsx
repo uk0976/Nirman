@@ -125,11 +125,11 @@ export default function ArtifactsPage() {
   const filteredArtifacts = artifactList.filter((art) => {
     const matchesSearch =
       !searchQuery ||
-      art.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      art.project.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      art.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
+      (art?.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (art?.project || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (art?.tags || []).some((t) => (t || "").toLowerCase().includes(searchQuery.toLowerCase()));
 
-    const matchesType = typeFilter === "all" || art.type.includes(typeFilter);
+    const matchesType = typeFilter === "all" || (art?.type || "").includes(typeFilter);
 
     return matchesSearch && matchesType;
   });

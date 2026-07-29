@@ -155,13 +155,13 @@ export default function ProjectsPage() {
   const filteredProjects = projectsList.filter((p) => {
     const matchesSearch =
       !searchQuery ||
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.techStack.some((t: string) => t.toLowerCase().includes(searchQuery.toLowerCase()));
+      (p?.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (p?.description || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (p?.techStack || []).some((t: string) => (t || "").toLowerCase().includes(searchQuery.toLowerCase()));
 
     const matchesStatus = statusFilter === "all" || p.status === statusFilter;
     const matchesPriority = priorityFilter === "all" || p.priority === priorityFilter;
-    const matchesTech = techFilter === "all" || p.techStack.includes(techFilter);
+    const matchesTech = techFilter === "all" || (p?.techStack || []).includes(techFilter);
 
     return matchesSearch && matchesStatus && matchesPriority && matchesTech;
   });

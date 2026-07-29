@@ -87,10 +87,10 @@ export default function AIEmployeesPage() {
   const filteredEmployees = employeeList.filter((emp) => {
     const matchesSearch =
       !searchQuery ||
-      emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      emp.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      emp.dept.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      emp.task.toLowerCase().includes(searchQuery.toLowerCase());
+      (emp?.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (emp?.role || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (emp?.dept || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (emp?.task || "").toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesDept = departmentFilter === "all" || emp.dept === departmentFilter;
     const matchesStatus = statusFilter === "all" || emp.status === statusFilter;
