@@ -132,15 +132,14 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="bg-[#030303] text-slate-100 min-h-screen relative font-sans selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div className="bg-[#030304] text-slate-100 min-h-screen relative font-sans selection:bg-indigo-500/30 selection:text-indigo-200">
       
       {/* Background Grids and glows */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-[0.4] pointer-events-none" />
-      <div className="absolute top-[-10%] left-[10%] w-[50%] h-[50%] radial-glow opacity-[0.5] pointer-events-none animate-pulse-glow" />
-      <div className="absolute bottom-[20%] right-[-10%] w-[60%] h-[60%] cyan-radial-glow opacity-[0.3] pointer-events-none" />
+      <div className="absolute inset-0 bg-grid-pattern opacity-[0.2] pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-6xl h-[600px] bg-[radial-gradient(ellipse_at_top,_rgba(99,102,241,0.1)_0%,_transparent_70%)] pointer-events-none" />
 
       {/* 1. STICKY NAVIGATION BAR */}
-      <header className="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-[#030303]/80 backdrop-blur-md transition-all duration-300">
+      <header className="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-[#030304]/90 backdrop-blur-md transition-all duration-300">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           
           {/* Logo Branding */}
@@ -179,9 +178,6 @@ export default function Home() {
       {/* 2. HERO SECTION */}
       <section id="home" className="max-w-7xl mx-auto px-6 pt-24 pb-20 relative text-center">
         
-        {/* Glow center */}
-        <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[700px] h-[300px] bg-indigo-600/10 blur-[100px] rounded-full pointer-events-none" />
-
         <div className="relative z-10 max-w-4xl mx-auto">
           {/* Tagline Badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/5 text-indigo-300 text-xs font-medium mb-6">

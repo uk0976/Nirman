@@ -2,14 +2,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #040406;
+  --background: #030304;
   --foreground: #f8fafc;
   --surface: #0a0a0f;
   --surface-border: rgba(255, 255, 255, 0.07);
   --accent-cyan: #38bdf8;
   --accent-indigo: #818cf8;
   --accent-violet: #c084fc;
-  --grid-color: rgba(255, 255, 255, 0.025);
+  --grid-color: rgba(255, 255, 255, 0.02);
 }
 
 body {
