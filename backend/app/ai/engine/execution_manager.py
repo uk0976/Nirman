@@ -11,6 +11,7 @@ from app.ai.prompts.prompt_builder import PromptBuilder
 from app.ai.memory.memory_manager import MemoryManager
 from app.ai.events.event_bus import event_bus
 from app.ai.engine.artifact_collector import ArtifactCollector, CollectedArtifact
+from app.ai.providers.factory import get_llm_provider
 
 logger = logging.getLogger(__name__)
 
@@ -28,8 +29,9 @@ class TaskExecutionResult(BaseModel):
 
 class ExecutionManager:
     """
-    Executes task batches concurrently, handles automatic retries with exponential backoff,
-    tracks token consumption, and publishes progress events.
+    Executes task batches concurrently using LLMProvider instances,
+    handles automatic retries with exponential backoff, tracks token consumption,
+    and publishes streaming progress events.
     """
     
     def __init__(
@@ -74,6 +76,7 @@ class ExecutionManager:
     ) -> TaskExecutionResult:
         
         agent = self.agent_router.route_task(subtask.assigned_role)
+        provider = get_llm_provider("openai")
         start_time = time.time()
 
         await event_bus.publish(
@@ -95,17 +98,32 @@ class ExecutionManager:
                     {"task_id": subtask.task_id, "agent": agent.name, "attempt": attempt + 1}
                 )
 
-                # Simulated AI LLM generation (Real integration connects to LLM provider)
-                output_text = f"[{agent.role} {agent.name}] Completed {subtask.title}.\n"
-                output_text += f"```python\n# {subtask.title} Implementation\ndef execute_{subtask.task_id.replace('-', '_')}():\n    return True\n```"
-                
+                # Execute LLM provider generation
+                system_prompt = messages[0]["content"]
+                user_prompt = messages[1]["content"]
+
+                # Collect streaming response tokens
+                output_text = ""
+                async for token in provider.stream(user_prompt, system_prompt=system_prompt, config={"model": agent.model}):
+                    output_text += token
+                    await event_bus.publish("token_stream", {"task_id": subtask.task_id, "token": token})
+
+                if not output_text.strip():
+                    output_text = await provider.generate(user_prompt, system_prompt=system_prompt, config={"model": agent.model})
+
+                # Calculate tokens & estimated cost
+                prompt_tokens = len(user_prompt.split()) + len(system_prompt.split())
+                completion_tokens = len(output_text.split())
+                tokens_used = prompt_tokens + completion_tokens
+                cost_usd = provider.estimate_cost(prompt_tokens, completion_tokens, agent.model)
+
                 # Extract artifacts
                 artifacts = self.artifact_collector.extract_artifacts(subtask.task_id, agent.role, output_text)
                 elapsed = time.time() - start_time
 
                 await event_bus.publish(
                     "task_completed",
-                    {"task_id": subtask.task_id, "agent": agent.name, "status": "COMPLETED"}
+                    {"task_id": subtask.task_id, "agent": agent.name, "status": "COMPLETED", "tokens": tokens_used, "cost": cost_usd}
                 )
 
                 return TaskExecutionResult(
@@ -115,8 +133,8 @@ class ExecutionManager:
                     status="COMPLETED",
                     output=output_text,
                     artifacts=artifacts,
-                    tokens_used=1250,
-                    cost_usd=0.0035,
+                    tokens_used=tokens_used,
+                    cost_usd=round(cost_usd, 5),
                     execution_time_sec=round(elapsed, 2),
                 )
             except Exception as err:
