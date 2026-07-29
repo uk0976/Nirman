@@ -267,10 +267,10 @@ export default function Home() {
                       }`}
                     >
                       <span className="text-2xl mb-1">
-                        {node.name.includes("Alice") ? "👩‍💼" : "🤖"}
+                        {node?.name?.includes("Alice") ? "👩‍💼" : "🤖"}
                       </span>
-                      <span className="text-[11px] font-bold text-slate-200">{node.name.split(" ")[0]}</span>
-                      <span className="text-[9px] text-slate-500">{node.role}</span>
+                      <span className="text-[11px] font-bold text-slate-200">{node?.name ? node.name.split(" ")[0] : "Agent"}</span>
+                      <span className="text-[9px] text-slate-500">{node?.role || ""}</span>
                     </div>
                   ))}
                 </div>
@@ -293,9 +293,10 @@ export default function Home() {
                 >
                   <AnimatePresence>
                     {logs.map((log, i) => {
-                      const isSystem = log.includes("[SYSTEM]");
-                      const isWarning = log.includes("[WAR ROOM]");
-                      const isQA = log.includes("[QA]");
+                      const logStr = typeof log === "string" ? log : String(log || "");
+                      const isSystem = logStr.includes("[SYSTEM]");
+                      const isWarning = logStr.includes("[WAR ROOM]");
+                      const isQA = logStr.includes("[QA]");
                       return (
                         <motion.div 
                           key={i}
@@ -614,9 +615,9 @@ export default function Home() {
               return (
                 <div key={i} className="flex flex-col items-center flex-1">
                   <div className={`w-16 h-16 rounded-full flex items-center justify-center border-2 transition-all ${
-                    node.desc.includes("100%") 
+                    (node?.desc || "").includes("100%") 
                       ? "border-emerald-500 bg-emerald-500/10 text-emerald-400" 
-                      : node.desc.includes("progress") 
+                      : (node?.desc || "").includes("progress") 
                         ? "border-indigo-500 bg-indigo-500/10 text-indigo-400 animate-pulse" 
                         : "border-white/10 bg-black/40 text-slate-500"
                   }`}>
