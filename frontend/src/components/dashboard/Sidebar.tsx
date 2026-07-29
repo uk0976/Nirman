@@ -52,7 +52,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside
-      className={`fixed top-0 left-0 h-screen z-40 bg-[#060608]/90 backdrop-blur-xl border-r border-white/[0.08] transition-all duration-300 flex flex-col justify-between ${
+      className={`fixed top-0 left-0 h-screen z-40 bg-[#050508]/95 backdrop-blur-2xl border-r border-white/[0.08] transition-all duration-300 flex flex-col justify-between ${
         collapsed ? "w-20" : "w-64"
       }`}
     >
@@ -60,13 +60,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div>
         <div className="h-16 px-4 flex items-center justify-between border-b border-white/[0.06]">
           {!collapsed ? (
-            <a href="/dashboard" className="flex items-center gap-2 font-bold text-lg">
-              <span className="bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-500 bg-clip-text text-transparent truncate">
+            <a href="/dashboard" className="flex items-center gap-2 font-bold text-lg group">
+              <span className="stitch-gradient-text font-extrabold tracking-tight text-lg truncate">
                 निर्माण | Nirman
               </span>
             </a>
           ) : (
-            <span className="mx-auto text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+            <span className="mx-auto text-xl font-extrabold stitch-gradient-text">
               नि
             </span>
           )}
@@ -81,7 +81,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Navigation Items List */}
-        <nav className="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-140px)]">
+        <nav className="p-3 space-y-1.5 overflow-y-auto max-h-[calc(100vh-140px)]">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
@@ -90,14 +90,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <a
                 key={item.label}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all relative group ${
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all relative group ${
                   isActive
-                    ? "bg-indigo-600/20 text-white border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.15)]"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]"
+                    ? "bg-gradient-to-r from-indigo-600/25 to-purple-600/25 text-white border border-indigo-500/40 shadow-[0_0_20px_rgba(99,102,241,0.2)]"
+                    : "text-slate-400 hover:text-slate-100 hover:bg-white/[0.04]"
                 }`}
                 title={collapsed ? item.label : undefined}
               >
-                <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-indigo-400" : "text-slate-400 group-hover:text-slate-200"}`} />
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-cyan-400" : "text-slate-400 group-hover:text-slate-200"}`} />
 
                 {!collapsed && (
                   <span className="truncate flex-1">{item.label}</span>
@@ -105,12 +105,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
                 {!collapsed && item.badge && (
                   <span
-                    className={`text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full ${
+                    className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
                       item.badge === "Live"
                         ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 animate-pulse"
                         : isActive
-                        ? "bg-indigo-500/30 text-indigo-300"
-                        : "bg-white/[0.06] text-slate-400"
+                        ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
+                        : "bg-white/[0.06] text-slate-400 border border-white/10"
                     }`}
                   >
                     {item.badge}
@@ -121,7 +121,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {isActive && (
                   <motion.div
                     layoutId="activeSideGlow"
-                    className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-indigo-500 rounded-r-full shadow-[0_0_8px_#6366f1]"
+                    className="absolute left-0 top-2 bottom-2 w-1 bg-gradient-to-b from-cyan-400 to-indigo-500 rounded-r-full shadow-[0_0_10px_#38bdf8]"
                   />
                 )}
               </a>
