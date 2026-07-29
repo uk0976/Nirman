@@ -4,34 +4,41 @@ import React, { useState, useEffect } from "react";
 import { Activity, Terminal, Shield, CheckCircle, Code, FileText } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/lib/api-client";
+
 export const LiveActivityFeed: React.FC = () => {
-  const [activities, setActivities] = useState([
-    { id: 1, agent: "Alice (CEO)", action: "Approved Sprint 1 deliverables roadmap", project: "Inventory Control API", time: "Just now", icon: CheckCircle, color: "text-emerald-400" },
-    { id: 2, agent: "Charlie (Architect)", action: "Generated system structural layout specs", project: "Inventory Control API", time: "2m ago", icon: FileText, color: "text-purple-400" },
-    { id: 3, agent: "Fiona (Backend)", action: "Committed /api/v1/auth controller routers", project: "Mobile Warehouse Portal", time: "4m ago", icon: Code, color: "text-indigo-400" },
-    { id: 4, agent: "Ian (QA)", action: "Ran backend test suite... 40 tests passed", project: "Inventory Control API", time: "6m ago", icon: CheckCircle, color: "text-teal-400" },
-    { id: 5, agent: "Jack (Security)", action: "Verified OWASP input sanitization constraints", project: "Mobile Warehouse Portal", time: "9m ago", icon: Shield, color: "text-amber-400" },
-  ]);
+  const { data: pipelineData } = useQuery({
+    queryKey: ["pipeline-activity"],
+    queryFn: async () => {
+      try {
+        const res = await apiClient.get("/pipeline/list");
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          const mapped: any[] = [];
+          res.data.forEach((pipe: any) => {
+            (pipe.history || []).forEach((item: any, idx: number) => {
+              mapped.push({
+                id: `${pipe.pipeline_id}-${idx}`,
+                agent: `${item.stage || "Pipeline"} Stage`,
+                action: `${item.event || "EVENT"} - Duration: ${item.duration_sec || 0}s`,
+                project: `Project ${pipe.project_id || "Active"}`,
+                time: item.timestamp ? new Date(item.timestamp * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Just now",
+                icon: CheckCircle,
+                color: "text-indigo-400",
+              });
+            });
+          });
+          return mapped.reverse();
+        }
+      } catch (err) {
+        // Fallback
+      }
+      return [];
+    },
+    refetchInterval: 3000,
+  });
 
-  useEffect(() => {
-    const newEvents = [
-      { agent: "Bob (PM)", action: "Refined PRD feature specifications", project: "Mobile Warehouse Portal", icon: FileText, color: "text-indigo-400" },
-      { agent: "George (DB)", action: "Updated PostgreSQL foreign key constraints", project: "Inventory Control API", icon: Code, color: "text-cyan-400" },
-      { agent: "Kate (DevOps)", action: "Pushed container image to staging registry", project: "Mobile Warehouse Portal", icon: CheckCircle, color: "text-emerald-400" },
-    ];
-
-    let idx = 0;
-    const interval = setInterval(() => {
-      const event = newEvents[idx % newEvents.length];
-      setActivities((prev) => [
-        { id: Date.now(), ...event, time: "Just now" },
-        ...prev.slice(0, 7),
-      ]);
-      idx++;
-    }, 4500);
-
-    return () => clearInterval(interval);
-  }, []);
+  const activities = pipelineData || [];
 
   return (
     <div className="glass-panel p-6 border border-white/[0.08] text-left flex flex-col justify-between h-full">
@@ -45,8 +52,13 @@ export const LiveActivityFeed: React.FC = () => {
         </div>
 
         <div className="space-y-3 overflow-hidden">
-          <AnimatePresence>
-            {activities.map((act) => {
+          {activities.length === 0 ? (
+            <div className="p-6 text-center text-xs text-slate-500 font-mono">
+              No live execution events yet. Launch a project to view real agent activity streams.
+            </div>
+          ) : (
+            <AnimatePresence>
+              {activities.map((act) => {
               const Icon = act.icon;
               return (
                 <motion.div
@@ -69,6 +81,7 @@ export const LiveActivityFeed: React.FC = () => {
               );
             })}
           </AnimatePresence>
+        )}
         </div>
       </div>
     </div>
