@@ -3,7 +3,7 @@ from typing import List, Optional, Dict
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from app.execution.sandbox.sandbox import sandbox, SandboxResult
+from backend.app.execution.sandbox.sandbox import sandbox, SandboxResult
 
 logger = logging.getLogger(__name__)
 

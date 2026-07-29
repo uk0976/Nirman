@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from app.execution.pipeline import pipeline_engine, PipelineState
+from backend.app.execution.pipeline import pipeline_engine, PipelineState
 
 logger = logging.getLogger(__name__)
 

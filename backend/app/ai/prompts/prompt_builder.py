@@ -1,5 +1,5 @@
 from typing import Dict, Any, List
-from app.ai.registry.agent_router import AgentProfile
+from backend.app.ai.registry.agent_router import AgentProfile
 
 class PromptBuilder:
     """

@@ -1,12 +1,12 @@
 import logging
 from typing import Dict, Any, Optional
 
-from app.ai.providers.base import LLMProvider
-from app.ai.providers.openai import OpenAIProvider
-from app.ai.providers.claude import ClaudeProvider
-from app.ai.providers.gemini import GeminiProvider
-from app.ai.providers.ollama import OllamaProvider
-from app.ai.providers.azure import AzureOpenAIProvider
+from backend.app.ai.providers.base import LLMProvider
+from backend.app.ai.providers.openai import OpenAIProvider
+from backend.app.ai.providers.claude import ClaudeProvider
+from backend.app.ai.providers.gemini import GeminiProvider
+from backend.app.ai.providers.ollama import OllamaProvider
+from backend.app.ai.providers.azure import AzureOpenAIProvider
 
 logger = logging.getLogger(__name__)
 

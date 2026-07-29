@@ -5,7 +5,7 @@ import logging
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
 
-from app.ai.events.event_bus import event_bus
+from backend.app.ai.events.event_bus import event_bus
 
 logger = logging.getLogger(__name__)
 

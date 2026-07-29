@@ -4,13 +4,13 @@ import time
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field
 
-from app.ai.planner.task_planner import TaskPlanner, ExecutionPlan
-from app.ai.registry.agent_router import AgentRouter
-from app.ai.context.context_manager import ContextManager
-from app.ai.memory.memory_manager import MemoryManager
-from app.ai.events.event_bus import event_bus
-from app.ai.engine.artifact_collector import ArtifactCollector, CollectedArtifact
-from app.ai.engine.execution_manager import ExecutionManager, TaskExecutionResult
+from backend.app.ai.planner.task_planner import TaskPlanner, ExecutionPlan
+from backend.app.ai.registry.agent_router import AgentRouter
+from backend.app.ai.context.context_manager import ContextManager
+from backend.app.ai.memory.memory_manager import MemoryManager
+from backend.app.ai.events.event_bus import event_bus
+from backend.app.ai.engine.artifact_collector import ArtifactCollector, CollectedArtifact
+from backend.app.ai.engine.execution_manager import ExecutionManager, TaskExecutionResult
 
 logger = logging.getLogger(__name__)
 

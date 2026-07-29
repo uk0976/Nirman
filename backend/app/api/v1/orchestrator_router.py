@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from app.core.database import get_db
-from app.services.orchestrator_service import OrchestratorService
-from app.ai.engine.orchestrator import OrchestrationResponse
+from backend.app.core.database import get_db
+from backend.app.services.orchestrator_service import OrchestratorService
+from backend.app.ai.engine.orchestrator import OrchestrationResponse
 
 logger = logging.getLogger(__name__)
 

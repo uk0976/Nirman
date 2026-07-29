@@ -3,7 +3,7 @@ from typing import Dict, Optional, List
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from app.services.qa_security_service import (
+from backend.app.services.qa_security_service import (
     qa_service,
     security_service,
     QAServiceResponse,

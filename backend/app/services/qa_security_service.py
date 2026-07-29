@@ -2,8 +2,8 @@ import logging
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel
 
-from app.ai.agents.specialists import QAEngineerAgent, SecurityEngineerAgent
-from app.execution.sandbox.sandbox import sandbox, SandboxResult
+from backend.app.ai.agents.specialists import QAEngineerAgent, SecurityEngineerAgent
+from backend.app.execution.sandbox.sandbox import sandbox, SandboxResult
 
 logger = logging.getLogger(__name__)
 

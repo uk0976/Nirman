@@ -2,7 +2,7 @@ import logging
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 
-from app.ai.engine.orchestrator import orchestrator, OrchestrationResponse
+from backend.app.ai.engine.orchestrator import orchestrator, OrchestrationResponse
 
 logger = logging.getLogger(__name__)
 

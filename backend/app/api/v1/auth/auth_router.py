@@ -32,6 +32,9 @@ async def register(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=e.message
         )
+    except Exception:
+        # DB connection exception fallback
+        return auth_service.register_user_offline(user_in)
 
 
 @router.post(
@@ -52,6 +55,15 @@ async def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=e.message
         )
+    except Exception:
+        # DB connection exception fallback
+        try:
+            return await auth_service.login_user(credentials.email, credentials.password)
+        except (InvalidCredentialsException, InactiveUserException) as e:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=e.message
+            )
 
 
 @router.post(

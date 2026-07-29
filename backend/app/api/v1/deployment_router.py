@@ -3,7 +3,7 @@ from typing import List, Optional, Dict
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from app.services.deployment_engine import deployment_engine, DeploymentStatus
+from backend.app.services.deployment_engine import deployment_engine, DeploymentStatus
 
 logger = logging.getLogger(__name__)
 

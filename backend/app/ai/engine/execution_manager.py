@@ -4,14 +4,14 @@ import time
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel
 
-from app.ai.planner.task_planner import PlannedSubtask, ExecutionPlan
-from app.ai.registry.agent_router import AgentRouter, AgentProfile
-from app.ai.context.context_manager import ContextManager
-from app.ai.prompts.prompt_builder import PromptBuilder
-from app.ai.memory.memory_manager import MemoryManager
-from app.ai.events.event_bus import event_bus
-from app.ai.engine.artifact_collector import ArtifactCollector, CollectedArtifact
-from app.ai.providers.factory import get_llm_provider
+from backend.app.ai.planner.task_planner import PlannedSubtask, ExecutionPlan
+from backend.app.ai.registry.agent_router import AgentRouter, AgentProfile
+from backend.app.ai.context.context_manager import ContextManager
+from backend.app.ai.prompts.prompt_builder import PromptBuilder
+from backend.app.ai.memory.memory_manager import MemoryManager
+from backend.app.ai.events.event_bus import event_bus
+from backend.app.ai.engine.artifact_collector import ArtifactCollector, CollectedArtifact
+from backend.app.ai.providers.factory import get_llm_provider
 
 logger = logging.getLogger(__name__)
 
