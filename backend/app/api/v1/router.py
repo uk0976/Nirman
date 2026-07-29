@@ -14,6 +14,7 @@ from backend.app.api.v1.warroom.warroom_router import router as warroom_router
 from backend.app.api.v1.execution.execution_router import router as execution_router
 from backend.app.api.v1.orchestrator_router import router as orchestrator_router
 from backend.app.api.v1.github_router import router as github_router
+from backend.app.api.v1.sandbox_router import router as sandbox_router
 from backend.app.api.v1.stubs import (
     analytics_router,
     deployments_router
@@ -39,5 +40,6 @@ v1_router.include_router(warroom_router, prefix="/warroom", tags=["AI War Room"]
 v1_router.include_router(execution_router, prefix="/execution", tags=["Execution Pipeline"])
 v1_router.include_router(orchestrator_router)
 v1_router.include_router(github_router)
+v1_router.include_router(sandbox_router)
 v1_router.include_router(analytics_router)
 v1_router.include_router(deployments_router)
