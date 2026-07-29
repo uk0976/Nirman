@@ -51,7 +51,20 @@ export const RunningProjects: React.FC = () => {
         </div>
 
         <div className="space-y-4">
-          {projects.map((proj) => (
+          {projects.length === 0 ? (
+            <div className="p-8 text-center rounded-xl bg-black/40 border border-white/[0.06]">
+              <FolderKanban className="w-8 h-8 text-slate-500 mx-auto mb-2 opacity-50" />
+              <p className="text-xs font-semibold text-slate-300">No Running Projects</p>
+              <p className="text-[11px] text-slate-500 mt-1 mb-4">Create your first software development project to get started.</p>
+              <a
+                href="/projects"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-lg shadow-indigo-600/20 transition-all"
+              >
+                + Create Project
+              </a>
+            </div>
+          ) : (
+            projects.map((proj) => (
             <div
               key={proj.id}
               className="p-4 rounded-xl bg-black/40 border border-white/[0.06] hover:border-indigo-500/30 transition-all space-y-3"
@@ -106,7 +119,8 @@ export const RunningProjects: React.FC = () => {
                 </span>
               </div>
             </div>
-          ))}
+          ))
+        )}
         </div>
       </div>
     </div>

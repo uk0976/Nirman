@@ -22,7 +22,7 @@ export default function SettingsPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<SettingsTab>("providers");
+  const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
 
   // Fetch settings from Backend API
   const { data: settingsData } = useQuery({
@@ -76,7 +76,7 @@ export default function SettingsPage() {
         <div className="max-w-[1600px] mx-auto">
           
           {/* Header */}
-          <Header onSave={() => {}} />
+          <Header onSave={() => alert("Settings saved successfully!")} />
 
           {/* Tab Navigation & Active Content Layout */}
           <div className="flex items-start gap-8">
@@ -92,12 +92,44 @@ export default function SettingsPage() {
               {activeTab === "apikeys" && <APIKeyManager />}
               {activeTab === "integrations" && <IntegrationsPage />}
               {activeTab === "billing" && <BillingPage />}
+              {activeTab === "org" && (
+                <div className="glass-panel p-6 border border-white/[0.08] text-left space-y-4">
+                  <h3 className="text-lg font-bold text-white">Organization Settings</h3>
+                  <p className="text-xs text-slate-400">Manage organization name, team access permissions, and billing address.</p>
+                  <div className="space-y-3 pt-2">
+                    <label className="block text-xs font-semibold text-slate-300">Organization Name</label>
+                    <input type="text" defaultValue="Nirman Autonomous Software Inc." className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white" />
+                  </div>
+                </div>
+              )}
+              {activeTab === "workflows" && (
+                <div className="glass-panel p-6 border border-white/[0.08] text-left space-y-4">
+                  <h3 className="text-lg font-bold text-white">Workflow Stage Defaults</h3>
+                  <p className="text-xs text-slate-400">Configure default execution timeouts, auto-retry rules, and gate approval policies.</p>
+                </div>
+              )}
+              {activeTab === "security" && (
+                <div className="glass-panel p-6 border border-white/[0.08] text-left space-y-4">
+                  <h3 className="text-lg font-bold text-white">Security & Access Control</h3>
+                  <p className="text-xs text-slate-400">Manage 2FA enforcement, IP whitelist ranges, and session timeout limits.</p>
+                </div>
+              )}
+              {activeTab === "appearance" && (
+                <div className="glass-panel p-6 border border-white/[0.08] text-left space-y-4">
+                  <h3 className="text-lg font-bold text-white">Appearance & Design Theme</h3>
+                  <p className="text-xs text-slate-400">Customize dashboard layout density, dark mode contrast, and terminal font sizing.</p>
+                </div>
+              )}
               {activeTab !== "profile" &&
                 activeTab !== "providers" &&
                 activeTab !== "employees" &&
                 activeTab !== "apikeys" &&
                 activeTab !== "integrations" &&
-                activeTab !== "billing" && <AIProviderSettings />}
+                activeTab !== "billing" &&
+                activeTab !== "org" &&
+                activeTab !== "workflows" &&
+                activeTab !== "security" &&
+                activeTab !== "appearance" && <ProfileSettings />}
             </div>
 
           </div>

@@ -121,7 +121,7 @@ export default function ProjectsPage() {
     queryFn: async () => {
       try {
         const res = await apiClient.get("/projects/");
-        if (Array.isArray(res.data) && res.data.length > 0) {
+        if (Array.isArray(res.data)) {
           return res.data.map((p: any, idx: number) => ({
             id: p.id || `${idx + 1}`,
             name: p.name || "Untitled Project",
@@ -129,7 +129,7 @@ export default function ProjectsPage() {
             priority: p.priority || "High",
             status: p.status || "Running",
             currentPhase: p.current_stage || "Stage 1: Planning",
-            progress: p.progress || 25,
+            progress: p.progress || 0,
             workflowStage: p.workflow_stage || "Planning",
             techStack: p.tech_stack || ["FastAPI", "Next.js"],
             assignedAgents: [
@@ -138,18 +138,18 @@ export default function ProjectsPage() {
             ],
             estCompletion: "In progress",
             updatedAt: "Just now",
-            owner: "Alex Dev",
+            owner: "User",
           }));
         }
-        return mockProjects;
       } catch (err) {
-        return mockProjects;
+        // Fallback on network disconnect
       }
+      return [];
     },
-    initialData: mockProjects,
+    initialData: [],
   });
 
-  const projectsList = apiProjects || mockProjects;
+  const projectsList = apiProjects || [];
 
   // Filter & Search Logic
   const filteredProjects = projectsList.filter((p) => {

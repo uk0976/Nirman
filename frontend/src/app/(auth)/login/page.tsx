@@ -16,7 +16,7 @@ function LoginContent() {
   const { login } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const from = searchParams.get("from") || "/";
+  const from = searchParams.get("from") || "/dashboard";
   const sessionExpired = searchParams.get("session_expired") === "true";
 
   const [serverError, setServerError] = useState<string | null>(null);
