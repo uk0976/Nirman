@@ -10,25 +10,27 @@ import {
   FileCode2,
   Cpu,
   ArrowRight,
-  History
+  History,
+  Sparkles,
+  Loader2
 } from "lucide-react";
+import { apiClient } from "@/lib/api-client";
 
 interface SearchDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  onLaunchWizard?: (initialPrompt?: string) => void;
 }
 
-export const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
+export const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose, onLaunchWizard }) => {
   const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         if (isOpen) onClose();
-        else {
-          // Open triggered by topbar
-        }
       }
       if (e.key === "Escape" && isOpen) {
         onClose();
@@ -40,30 +42,61 @@ export const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) =
 
   if (!isOpen) return null;
 
-  const mockIndex = [
-    { type: "project", title: "Inventory Control API", desc: "Running • Stage 5 API Design", href: "/projects/1", icon: FolderKanban },
-    { type: "project", title: "Mobile Warehouse Portal", desc: "Paused • War Room Gate", href: "/projects/2", icon: FolderKanban },
-    { type: "agent", title: "Alice (CEO)", desc: "Operational • Executive Management", href: "/agents/alice", icon: Users },
-    { type: "agent", title: "Charlie (Software Architect)", desc: "Operational • System Architecture", href: "/agents/charlie", icon: Users },
-    { type: "artifact", title: "Architecture.md", desc: "Generated 10m ago by Charlie", href: "/artifacts/arch", icon: FileCode2 },
-    { type: "artifact", title: "Database.sql", desc: "Generated 15m ago by George", href: "/artifacts/db", icon: FileCode2 },
-    { type: "execution", title: "Execution Run #842", desc: "Running • Stage 5/14", href: "/executions/842", icon: Cpu },
+  const handleLaunchProject = async () => {
+    if (!query.trim()) return;
+    setLoading(true);
+    try {
+      const projRes = await apiClient.post("/projects/", {
+        name: query.slice(0, 32) || "New AI Project",
+        description: query,
+        status: "Running",
+      });
+
+      const projId = projRes.data?.id || `proj-${Date.now()}`;
+
+      await apiClient.post("/pipeline/start", {
+        project_id: String(projId),
+        prompt: query,
+      });
+
+      setLoading(false);
+      onClose();
+      window.location.href = "/dashboard";
+    } catch (err) {
+      setLoading(false);
+      onClose();
+      window.location.href = "/dashboard";
+    }
+  };
+
+  const handleKeyDownInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && query.trim()) {
+      e.preventDefault();
+      handleLaunchProject();
+    }
+  };
+
+  const realRoutes = [
+    { type: "route", title: "AI War Room", desc: "Collaborative multi-agent debate session", href: "/warroom", icon: Users },
+    { type: "route", title: "Autonomous Workflow Engine", desc: "View active 9-stage pipeline execution", href: "/workflow", icon: Cpu },
+    { type: "route", title: "Workspace Projects", desc: "View all active and completed projects", href: "/projects", icon: FolderKanban },
+    { type: "route", title: "System Artifacts", desc: "PRDs, architecture blueprints, & code", href: "/artifacts", icon: FileCode2 },
   ];
 
   const filteredResults = query
-    ? mockIndex.filter(
+    ? realRoutes.filter(
         (i) => i.title.toLowerCase().includes(query.toLowerCase()) || i.desc.toLowerCase().includes(query.toLowerCase())
       )
-    : mockIndex.slice(0, 5);
+    : realRoutes;
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-black/70 backdrop-blur-md px-4">
+      <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 bg-black/80 backdrop-blur-md px-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: -10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: -10 }}
-          className="w-full max-w-2xl bg-[#08080c] border border-white/10 rounded-2xl shadow-2xl overflow-hidden relative"
+          className="w-full max-w-2xl bg-[#08080c] border border-white/10 rounded-2xl shadow-2xl overflow-hidden relative text-left"
         >
           {/* Search Input Bar */}
           <div className="flex items-center gap-3 px-4 py-3.5 border-b border-white/[0.08]">
@@ -73,7 +106,8 @@ export const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) =
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search projects, AI agents, generated artifacts..."
+              onKeyDown={handleKeyDownInput}
+              placeholder="Type a requirement to launch AI project (e.g. 'Build SaaS analytics dashboard')..."
               className="w-full bg-transparent text-sm text-slate-100 placeholder-slate-500 focus:outline-none"
             />
             <button
@@ -84,10 +118,40 @@ export const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) =
             </button>
           </div>
 
-          {/* Results List */}
-          <div className="p-3 max-h-96 overflow-y-auto space-y-1">
+          {/* Results List & Launch AI Project CTA */}
+          <div className="p-3 max-h-96 overflow-y-auto space-y-2">
+            
+            {/* Dynamic Launch AI Project Card */}
+            {query.trim() && (
+              <div className="p-1">
+                <button
+                  onClick={handleLaunchProject}
+                  disabled={loading}
+                  className="w-full flex items-center justify-between p-3.5 rounded-xl bg-gradient-to-r from-indigo-600/30 to-purple-600/30 border border-indigo-500/50 hover:border-indigo-400 transition-all group text-left shadow-lg shadow-indigo-600/10"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shrink-0 shadow-md">
+                      {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5 text-cyan-300" />}
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold text-white block group-hover:text-cyan-300 transition-colors">
+                        🚀 Launch New AI Project
+                      </span>
+                      <span className="text-[11px] font-mono text-slate-300 truncate max-w-md block">
+                        "{query}"
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-indigo-300 group-hover:translate-x-1 transition-transform">
+                    <span>Press Enter</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </button>
+              </div>
+            )}
+
             <div className="px-3 py-1.5 text-[10px] font-mono text-slate-500 uppercase tracking-wider flex items-center justify-between">
-              <span>{query ? "Search Results" : "Recent Searches"}</span>
+              <span>{query ? "Quick Navigation" : "Workspace Destinations"}</span>
               {!query && <History className="w-3 h-3 text-slate-500" />}
             </div>
 
@@ -120,10 +184,10 @@ export const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) =
           {/* Search Footer info */}
           <div className="px-4 py-2.5 bg-black/40 border-t border-white/[0.06] flex items-center justify-between text-[11px] text-slate-500">
             <div className="flex items-center gap-3">
+              <span>Press <kbd className="px-1 py-0.5 bg-white/10 rounded font-mono text-[9px] text-slate-300">Enter</kbd> to launch AI build</span>
               <span>Press <kbd className="px-1 py-0.5 bg-white/10 rounded font-mono text-[9px] text-slate-300">ESC</kbd> to exit</span>
-              <span>Use <kbd className="px-1 py-0.5 bg-white/10 rounded font-mono text-[9px] text-slate-300">↑</kbd> <kbd className="px-1 py-0.5 bg-white/10 rounded font-mono text-[9px] text-slate-300">↓</kbd> to navigate</span>
             </div>
-            <span className="font-mono text-indigo-400">Nirman Global Search</span>
+            <span className="font-mono text-indigo-400">Nirman AI Launcher</span>
           </div>
         </motion.div>
       </div>
