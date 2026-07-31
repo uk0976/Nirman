@@ -6,6 +6,7 @@ import { TopNavbar } from "@/components/dashboard/TopNavbar";
 import { RightSidebar } from "@/components/dashboard/RightSidebar";
 import { NotificationPanel } from "@/components/dashboard/NotificationPanel";
 import { SearchDialog } from "@/components/dashboard/SearchDialog";
+import { CreateProjectWizard } from "@/components/projects/CreateProjectWizard";
 
 import { WelcomeHeader } from "@/components/dashboard/widgets/WelcomeHeader";
 import { MetricCardGrid } from "@/components/dashboard/widgets/MetricCardGrid";
@@ -21,6 +22,7 @@ export default function DashboardPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [createWizardOpen, setCreateWizardOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#030303] text-slate-100 relative font-sans selection:bg-indigo-500/30">
@@ -36,7 +38,7 @@ export default function DashboardPage() {
         sidebarCollapsed={sidebarCollapsed}
         onOpenSearch={() => setSearchOpen(true)}
         onOpenNotifications={() => setNotificationsOpen(true)}
-        onOpenQuickCreate={() => setSearchOpen(true)}
+        onOpenQuickCreate={() => setCreateWizardOpen(true)}
       />
 
       {/* Notification Slide-out Panel */}
@@ -49,6 +51,13 @@ export default function DashboardPage() {
       <SearchDialog
         isOpen={searchOpen}
         onClose={() => setSearchOpen(false)}
+      />
+
+      {/* 5-Step Project Creation Wizard Modal */}
+      <CreateProjectWizard
+        isOpen={createWizardOpen}
+        onClose={() => setCreateWizardOpen(false)}
+        onSuccess={() => {}}
       />
 
       {/* Main Workspace Scroll Area */}
@@ -84,7 +93,7 @@ export default function DashboardPage() {
             {/* Workflow Timeline Visualization */}
             <WorkflowTimeline />
 
-            {/* Recent AI Executions Table */}
+            {/* Recent AI Execution Logs Table */}
             <ExecutionTable />
 
             {/* Analytics Charts */}

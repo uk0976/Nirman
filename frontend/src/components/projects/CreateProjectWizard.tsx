@@ -77,10 +77,12 @@ export const CreateProjectWizard: React.FC<CreateProjectWizardProps> = ({
       setLoading(false);
       onSuccess();
       onClose();
+      window.location.href = "/dashboard";
     } catch (err) {
       setLoading(false);
       onSuccess();
       onClose();
+      window.location.href = "/dashboard";
     }
   };
 

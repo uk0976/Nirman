@@ -16,7 +16,7 @@ export const WorkflowTimeline: React.FC = () => {
         return [];
       }
     },
-    refetchInterval: 3000,
+    refetchInterval: 1000,
   });
 
   const activePipeline = pipelineList.length > 0 ? pipelineList[pipelineList.length - 1] : null;

@@ -35,7 +35,7 @@ export const LiveActivityFeed: React.FC = () => {
       }
       return [];
     },
-    refetchInterval: 3000,
+    refetchInterval: 1000,
   });
 
   const activities = pipelineData || [];
