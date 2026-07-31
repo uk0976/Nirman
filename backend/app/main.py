@@ -30,8 +30,14 @@ async def lifespan(app: FastAPI):
     # Log system startup details
     logger.info(f"Nirman Backend platform starting up in '{settings.ENVIRONMENT}' environment...")
     
-    # Auto-seed database metadata and AI agents if empty on boot
+    # Auto-create database tables and seed AI agents catalog if empty on boot
     try:
+        async with engine.begin() as conn:
+            from backend.app.models.base import Base
+            from backend.app.models import user, project, execution, agent, workflow, warroom, github, deployment, ai_audit
+            await conn.run_sync(Base.metadata.create_all)
+            logger.info("Database schema initialized successfully.")
+
         async with AsyncSessionLocal() as session:
             from backend.app.services.agent_service import AgentService
             agent_service = AgentService(session)

@@ -24,8 +24,8 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: int = 5432
     
-    # Database URL
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/nirman"
+    # Database URL (Defaults to SQLite for zero-setup local execution)
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./nirman.db")
     
     # Security & JWT Configuration
     JWT_SECRET_KEY: str

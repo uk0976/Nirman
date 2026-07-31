@@ -119,7 +119,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await fetchCurrentUser();
       }
     } catch (error) {
-      // Offline auth fallback for seamless testing
       if (typeof window !== "undefined") {
         localStorage.setItem("nirman_user_email", email);
       }
@@ -152,17 +151,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         is_verified: true
       });
 
-      setUser({
-        id: `usr-${Date.now()}`,
-        email: email,
-        full_name: fullName,
-        role: "user",
-        is_active: true,
-        is_verified: true,
-      });
-      setIsLoading(false);
+      // Auto login after registration
+      await login(email, password);
     } catch (error) {
-      // Fallback
       if (typeof window !== "undefined") {
         localStorage.setItem("nirman_user_email", email);
         localStorage.setItem("nirman_user_name", fullName);
