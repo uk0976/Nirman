@@ -91,36 +91,45 @@ export default function ArtifactsPage() {
     },
   ];
 
-  // Fetch Artifacts from Backend API
+  // Fetch Real Artifacts from Backend Pipeline API
   const { data: apiArtifacts } = useQuery({
     queryKey: ["artifacts"],
     queryFn: async () => {
       try {
-        const res = await apiClient.get("/artifacts/");
+        const res = await apiClient.get("/pipeline/list");
         if (Array.isArray(res.data) && res.data.length > 0) {
-          return res.data.map((a: any, i: number) => ({
-            id: a.id || `${i + 1}`,
-            name: a.name || mockArtifacts[i % 4].name,
-            project: a.project_name || "Inventory Control API",
-            author: a.created_by || "Charlie",
-            authorAvatar: mockArtifacts[i % 4].authorAvatar,
-            type: a.artifact_type || "Architecture",
-            version: a.version || "v1.0",
-            size: "18.4 KB",
-            updatedAt: "Just now",
-            tags: ["ai-generated", "production"],
-            content: a.content || "# AI Artifact Content",
-          }));
+          const list: ArtifactData[] = [];
+          res.data.forEach((pipe: any) => {
+            (pipe.stages || []).forEach((stg: any, i: number) => {
+              if (stg.artifact_produced && stg.artifact_content) {
+                list.push({
+                  id: `${pipe.pipeline_id}-${i}`,
+                  name: stg.artifact_produced,
+                  project: `Project ${pipe.project_id || "Active"}`,
+                  author: stg.assigned_agent || "AI Agent",
+                  authorAvatar: "🤖",
+                  type: `${stg.name || "Stage"} Artifact`,
+                  version: "v1.0",
+                  size: `${Math.round(stg.artifact_content.length / 100) / 10} KB`,
+                  updatedAt: stg.completed_at ? new Date(stg.completed_at * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Just now",
+                  tags: ["ai-generated", stg.name.toLowerCase()],
+                  content: stg.artifact_content,
+                });
+              }
+            });
+          });
+          if (list.length > 0) return list.reverse();
         }
       } catch (err) {
         // Fallback
       }
-      return mockArtifacts;
+      return [];
     },
-    initialData: mockArtifacts,
+    refetchInterval: 1000,
+    initialData: [],
   });
 
-  const artifactList = apiArtifacts || mockArtifacts;
+  const artifactList = apiArtifacts || [];
 
   const filteredArtifacts = artifactList.filter((art) => {
     const matchesSearch =

@@ -1,3 +1,4 @@
+import os
 import uuid
 import time
 import asyncio
@@ -6,6 +7,7 @@ from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
 
 from backend.app.ai.events.event_bus import event_bus
+from backend.app.core.database import AsyncSessionLocal
 
 logger = logging.getLogger(__name__)
 
@@ -385,6 +387,50 @@ class AutonomousPipelineEngine:
             artifact_name, artifact_body = generate_stage_artifact_content(stage.name, state.prompt, state.project_id)
             stage.artifact_produced = artifact_name
             stage.artifact_content = artifact_body
+
+            # Save real file to disk under generated_projects/{project_id}/
+            try:
+                base_dir = os.path.join(os.getcwd(), "generated_projects", str(state.project_id))
+                os.makedirs(base_dir, exist_ok=True)
+                file_path = os.path.join(base_dir, artifact_name)
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(artifact_body)
+                logger.info(f"Saved real artifact to disk: {file_path}")
+            except Exception as disk_err:
+                logger.warning(f"Disk write error for {artifact_name}: {str(disk_err)}")
+
+            # Save artifact & update project progress in database
+            try:
+                async with AsyncSessionLocal() as session:
+                    import uuid
+                    from sqlalchemy import select
+                    from backend.app.models.project import Project, ProjectFile
+
+                    try:
+                        pid = uuid.UUID(state.project_id)
+                    except ValueError:
+                        pid = None
+
+                    if pid:
+                        result = await session.execute(select(Project).where(Project.id == pid))
+                        proj = result.scalar_one_or_none()
+                        if proj:
+                            progress_pct = int(((state.current_stage_idx + 1) / len(state.stages)) * 100)
+                            proj.progress = progress_pct
+                            proj.current_stage = f"Stage {state.current_stage_idx + 1}: {stage.name}"
+                            proj.status = "Completed" if state.current_stage_idx >= len(state.stages) - 1 else "Running"
+                            
+                            pf = ProjectFile(
+                                project_id=pid,
+                                file_name=artifact_name,
+                                file_path=os.path.join("generated_projects", str(state.project_id), artifact_name),
+                                file_size=len(artifact_body.encode("utf-8")),
+                                content_type="text/plain" if artifact_name.endswith(".md") else "text/x-code"
+                            )
+                            session.add(pf)
+                            await session.commit()
+            except Exception as db_err:
+                logger.warning(f"DB update warning for stage {stage.name}: {str(db_err)}")
 
             await event_bus.publish(
                 "artifact_generated",

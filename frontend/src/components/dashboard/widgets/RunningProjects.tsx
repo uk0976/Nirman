@@ -2,40 +2,42 @@
 
 import React from "react";
 import { FolderKanban, Clock, Users, ArrowUpRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/lib/api-client";
 
 export const RunningProjects: React.FC = () => {
-  const projects = [
-    {
-      id: "1",
-      name: "Inventory Control API",
-      phase: "Stage 5: API Development",
-      progress: 68,
-      priority: "High",
-      assigned: ["Alice", "Bob", "Charlie", "Fiona", "Ian"],
-      estCompletion: "Tomorrow, 4:00 PM",
-      status: "Running",
+  const { data: activeProjects = [] } = useQuery({
+    queryKey: ["running-projects-list"],
+    queryFn: async () => {
+      try {
+        const res = await apiClient.get("/pipeline/list");
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          return res.data.map((pipe: any) => {
+            const completedCount = (pipe.stages || []).filter((s: any) => s.status === "COMPLETED").length;
+            const totalCount = (pipe.stages || []).length || 9;
+            const progressPct = Math.round((completedCount / totalCount) * 100);
+            const currentStageObj = pipe.stages?.[pipe.current_stage_idx] || pipe.stages?.[pipe.stages.length - 1];
+
+            return {
+              id: pipe.project_id || pipe.pipeline_id,
+              name: pipe.prompt?.slice(0, 32) || "Autonomous AI Project",
+              phase: currentStageObj ? `Stage ${pipe.current_stage_idx + 1}: ${currentStageObj.name}` : "Execution Loop",
+              progress: progressPct,
+              priority: "High",
+              assigned: ["Bob (PM)", "Charlie (Architect)", "Evan (Frontend)", "Fiona (Backend)"],
+              estCompletion: pipe.status === "COMPLETED" ? "Completed" : "Running Live",
+              status: pipe.status,
+            };
+          }).reverse();
+        }
+      } catch (err) {
+        // Fallback
+      }
+      return [];
     },
-    {
-      id: "2",
-      name: "Mobile Warehouse Portal",
-      phase: "Stage 4: Architecture Gate Review",
-      progress: 42,
-      priority: "Critical",
-      assigned: ["Charlie", "George", "Diana", "Jack"],
-      estCompletion: "2 days left",
-      status: "Paused (War Room Gate)",
-    },
-    {
-      id: "3",
-      name: "Security OAuth Microservice",
-      phase: "Stage 9: Security Audit",
-      progress: 88,
-      priority: "Medium",
-      assigned: ["Jack", "Fiona", "Kate", "Leo"],
-      estCompletion: "Today, 6:30 PM",
-      status: "Running",
-    },
-  ];
+    refetchInterval: 1000,
+    initialData: [],
+  });
 
   return (
     <div className="glass-panel p-6 border border-white/[0.08] text-left flex flex-col justify-between h-full">
@@ -51,7 +53,7 @@ export const RunningProjects: React.FC = () => {
         </div>
 
         <div className="space-y-4">
-          {projects.length === 0 ? (
+          {activeProjects.length === 0 ? (
             <div className="p-8 text-center rounded-xl bg-black/40 border border-white/[0.06]">
               <FolderKanban className="w-8 h-8 text-slate-500 mx-auto mb-2 opacity-50" />
               <p className="text-xs font-semibold text-slate-300">No Running Projects</p>
@@ -64,7 +66,7 @@ export const RunningProjects: React.FC = () => {
               </a>
             </div>
           ) : (
-            projects.map((proj) => (
+            activeProjects.map((proj: any) => (
             <div
               key={proj.id}
               className="p-4 rounded-xl bg-black/40 border border-white/[0.06] hover:border-indigo-500/30 transition-all space-y-3"
@@ -73,21 +75,15 @@ export const RunningProjects: React.FC = () => {
                 <div>
                   <h4 className="text-sm font-bold text-white flex items-center gap-2">
                     {proj.name}
-                    <span
-                      className={`text-[9px] font-mono font-semibold px-2 py-0.5 rounded-full ${
-                        proj.priority === "Critical"
-                          ? "bg-rose-500/20 text-rose-300 border border-rose-500/30"
-                          : "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
-                      }`}
-                    >
-                      {proj.priority} Priority
+                    <span className="text-[9px] font-mono font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                      {proj.status}
                     </span>
                   </h4>
                   <span className="text-xs font-mono text-slate-400 block mt-0.5">{proj.phase}</span>
                 </div>
 
                 <a
-                  href={`/projects/${proj.id}`}
+                  href={`/projects`}
                   className="p-1.5 rounded-lg bg-white/[0.04] text-slate-400 hover:text-white hover:bg-white/[0.08] transition-all"
                   title="Open Project Workspace"
                 >
