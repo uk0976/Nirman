@@ -17,6 +17,7 @@ import { VersionHistoryModal } from "@/components/artifacts/VersionHistoryModal"
 import { ArtifactFilters } from "@/components/artifacts/ArtifactFilters";
 import { ArtifactSidebar } from "@/components/artifacts/ArtifactSidebar";
 import { ShareModal } from "@/components/artifacts/ShareModal";
+import { CreateProjectWizard } from "@/components/projects/CreateProjectWizard";
 
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
@@ -25,6 +26,7 @@ export default function ArtifactsPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [createWizardOpen, setCreateWizardOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
   // Modals state
@@ -157,7 +159,7 @@ export default function ArtifactsPage() {
         sidebarCollapsed={sidebarCollapsed}
         onOpenSearch={() => setSearchOpen(true)}
         onOpenNotifications={() => setNotificationsOpen(true)}
-        onOpenQuickCreate={() => setSearchOpen(true)}
+        onOpenQuickCreate={() => setCreateWizardOpen(true)}
       />
 
       {/* Notification Slide-out Panel */}
@@ -170,6 +172,13 @@ export default function ArtifactsPage() {
       <SearchDialog
         isOpen={searchOpen}
         onClose={() => setSearchOpen(false)}
+      />
+
+      {/* 5-Step Project Creation Wizard Modal */}
+      <CreateProjectWizard
+        isOpen={createWizardOpen}
+        onClose={() => setCreateWizardOpen(false)}
+        onSuccess={() => {}}
       />
 
       {/* Preview Modal */}
@@ -205,7 +214,7 @@ export default function ArtifactsPage() {
             <Header
               viewMode={viewMode}
               onViewModeChange={setViewMode}
-              onOpenGenerateModal={() => setPreviewArtifact(mockArtifacts[0])}
+              onOpenGenerateModal={() => setCreateWizardOpen(true)}
             />
 
             {/* KPI Cards */}
@@ -226,6 +235,7 @@ export default function ArtifactsPage() {
                 onPreview={(art) => setPreviewArtifact(art)}
                 onVersionHistory={(art) => setVersionArtifact(art)}
                 onShare={(art) => setShareArtifact(art)}
+                onOpenCreateWizard={() => setCreateWizardOpen(true)}
               />
             )}
 
