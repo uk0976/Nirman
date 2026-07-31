@@ -2,11 +2,39 @@
 
 import React from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { Sparkles, ArrowRight, Activity, ShieldCheck, Zap } from "lucide-react";
+import { ArrowRight, Zap } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/lib/api-client";
 
 export const WelcomeHeader: React.FC = () => {
   const { user } = useAuth();
-  const userName = user?.full_name || "Enterprise Lead";
+  const userName = user?.full_name || user?.email?.split("@")[0] || "User";
+
+  const { data: projects = [] } = useQuery({
+    queryKey: ["welcome-header-projects"],
+    queryFn: async () => {
+      try {
+        const res = await apiClient.get("/projects/");
+        return Array.isArray(res.data) ? res.data : [];
+      } catch (err) {
+        return [];
+      }
+    },
+  });
+
+  const { data: pipelines = [] } = useQuery({
+    queryKey: ["welcome-header-pipelines"],
+    queryFn: async () => {
+      try {
+        const res = await apiClient.get("/pipeline/list");
+        return Array.isArray(res.data) ? res.data : [];
+      } catch (err) {
+        return [];
+      }
+    },
+  });
+
+  const activeCount = projects.length || pipelines.length;
 
   return (
     <div className="glass-panel p-8 border border-white/[0.08] relative overflow-hidden text-left mb-8">
@@ -27,7 +55,11 @@ export const WelcomeHeader: React.FC = () => {
           </h1>
 
           <p className="text-sm text-slate-400 font-normal max-w-xl">
-            Your Autonomous AI Software Company is actively collaborating across <strong className="text-slate-200 font-semibold">3 running projects</strong> and <strong className="text-slate-200 font-semibold">12 online specialists</strong>.
+            {activeCount > 0 ? (
+              <>Your Autonomous AI Software Company is actively collaborating across <strong className="text-slate-200 font-semibold">{activeCount} running projects</strong> and <strong className="text-slate-200 font-semibold">12 online specialists</strong>.</>
+            ) : (
+              <>Your Autonomous AI Software Company is ready. Click <strong className="text-indigo-300 font-semibold">+ New Requirement</strong> to launch your first AI software project.</>
+            )}
           </p>
         </div>
 

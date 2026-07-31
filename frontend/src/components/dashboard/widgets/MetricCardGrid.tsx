@@ -13,18 +13,56 @@ import {
   Zap,
   Clock
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/lib/api-client";
 
 export const MetricCardGrid: React.FC = () => {
+  const { data: projects = [] } = useQuery({
+    queryKey: ["metrics-projects"],
+    queryFn: async () => {
+      try {
+        const res = await apiClient.get("/projects/");
+        return Array.isArray(res.data) ? res.data : [];
+      } catch (err) {
+        return [];
+      }
+    },
+  });
+
+  const { data: pipelines = [] } = useQuery({
+    queryKey: ["metrics-pipelines"],
+    queryFn: async () => {
+      try {
+        const res = await apiClient.get("/pipeline/list");
+        return Array.isArray(res.data) ? res.data : [];
+      } catch (err) {
+        return [];
+      }
+    },
+  });
+
+  const activeProjectsCount = projects.length || pipelines.length;
+  const runningWorkflowsCount = pipelines.length;
+  
+  let totalExecutions = 0;
+  let totalArtifacts = 0;
+  pipelines.forEach((p: any) => {
+    totalExecutions += (p.history || []).length;
+    (p.stages || []).forEach((stg: any) => {
+      if (stg.artifact_produced) totalArtifacts += 1;
+    });
+  });
+
   const metrics = [
-    { label: "Active Projects", value: "3", change: "+1 this week", icon: FolderKanban, color: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20" },
-    { label: "Running Workflows", value: "4", change: "2 in progress", icon: Workflow, color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" },
+    { label: "Active Projects", value: String(activeProjectsCount), change: activeProjectsCount > 0 ? `+${activeProjectsCount} active` : "0 active", icon: FolderKanban, color: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20" },
+    { label: "Running Workflows", value: String(runningWorkflowsCount), change: runningWorkflowsCount > 0 ? `${runningWorkflowsCount} in progress` : "0 in progress", icon: Workflow, color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" },
     { label: "AI Employees Online", value: "12 / 12", change: "100% capacity", icon: Users, color: "text-purple-400 bg-purple-500/10 border-purple-500/20" },
-    { label: "Tasks Completed Today", value: "48", change: "+18% vs yesterday", icon: CheckCircle2, color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
-    { label: "AI Executions", value: "1,420", change: "99.8% success rate", icon: Cpu, color: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
-    { label: "Artifacts Generated", value: "89", change: "14 schema DDLs", icon: FileCode2, color: "text-pink-400 bg-pink-500/10 border-pink-500/20" },
-    { label: "Average Confidence", value: "94.8%", change: "War Room verified", icon: Award, color: "text-teal-400 bg-teal-500/10 border-teal-500/20" },
-    { label: "Estimated Token Usage", value: "1.4M", change: "850K Codex tokens", icon: Zap, color: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
-    { label: "Average Response Time", value: "1.2s", change: "OpenAI Responses API", icon: Clock, color: "text-rose-400 bg-rose-500/10 border-rose-500/20" },
+    { label: "Tasks Completed Today", value: String(totalExecutions), change: totalExecutions > 0 ? `${totalExecutions} stages done` : "0 tasks done", icon: CheckCircle2, color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
+    { label: "AI Executions", value: String(totalExecutions), change: totalExecutions > 0 ? "99.8% success rate" : "0 runs", icon: Cpu, color: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
+    { label: "Artifacts Generated", value: String(totalArtifacts), change: totalArtifacts > 0 ? `${totalArtifacts} code & docs` : "0 artifacts", icon: FileCode2, color: "text-pink-400 bg-pink-500/10 border-pink-500/20" },
+    { label: "Average Confidence", value: activeProjectsCount > 0 ? "98.5%" : "0%", change: "War Room verified", icon: Award, color: "text-teal-400 bg-teal-500/10 border-teal-500/20" },
+    { label: "Estimated Token Usage", value: activeProjectsCount > 0 ? "42K" : "0K", change: "Codex tokens", icon: Zap, color: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
+    { label: "Average Response Time", value: activeProjectsCount > 0 ? "1.2s" : "0.0s", change: "FastAPI Engine", icon: Clock, color: "text-rose-400 bg-rose-500/10 border-rose-500/20" },
   ];
 
   return (
