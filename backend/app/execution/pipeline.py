@@ -55,6 +55,16 @@ class PipelineStageState(BaseModel):
     artifact_content: Optional[str] = None
     duration_sec: float = 0.0
 
+class PipelineState(BaseModel):
+    pipeline_id: str
+    project_id: str
+    prompt: str
+    status: str = "RUNNING"  # RUNNING, PAUSED, COMPLETED, FAILED, ROLLED_BACK
+    current_stage_idx: int = 0
+    stages: List[PipelineStageState]
+    history: List[Dict[str, Any]] = Field(default_factory=list)
+    created_at: float = Field(default_factory=time.time)
+
 def generate_stage_artifact_content(stage_name: str, prompt: str, project_id: str) -> tuple[str, str]:
     title = prompt.strip().title() or "Autonomous Software Product"
     
