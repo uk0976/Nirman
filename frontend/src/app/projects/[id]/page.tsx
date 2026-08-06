@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { TopNavbar } from "@/components/dashboard/TopNavbar";
+import { TaskBoard } from "@/components/project-details/TaskBoard";
+import { DecisionPanel } from "@/components/project-details/DecisionPanel";
+import { FileExplorer } from "@/components/project-details/FileExplorer";
 import {
   FolderGit2,
   CheckCircle2,
@@ -14,24 +17,31 @@ import {
   ShieldCheck,
   Cpu,
   Play,
-  Code2,
   FileText,
   Plug,
   TestTube,
-  Globe
+  Globe,
+  Users,
+  Compass
 } from "lucide-react";
 
-const WORKSPACE_TABS = [
+const WORKSPACE_18_TABS = [
   { id: "overview", label: "Overview", icon: Layers },
   { id: "requirements", label: "Requirements", icon: FileText },
+  { id: "vision", label: "Product Vision", icon: Compass },
   { id: "prd", label: "PRD Spec", icon: FileCode2 },
   { id: "srs", label: "SRS Spec", icon: FileCode2 },
+  { id: "roadmap", label: "Roadmap", icon: Clock },
+  { id: "personas", label: "User Personas", icon: Users },
+  { id: "competitors", label: "Competitor Matrix", icon: Globe },
   { id: "architecture", label: "Architecture", icon: Layers },
   { id: "database", label: "Database 3NF", icon: Database },
   { id: "apis", label: "REST APIs", icon: Plug },
-  { id: "frontend", label: "Frontend", icon: Globe },
-  { id: "backend", label: "Backend", icon: Cpu },
-  { id: "testing", label: "Testing & QA", icon: TestTube },
+  { id: "uiux", label: "UI/UX Spec", icon: Globe },
+  { id: "frontend", label: "Frontend Studio", icon: Globe },
+  { id: "backend", label: "Backend Services", icon: Cpu },
+  { id: "agents", label: "AI Agents Roster", icon: Cpu },
+  { id: "testing", label: "QA & Testing", icon: TestTube },
   { id: "deployment", label: "Deployment", icon: Terminal },
   { id: "documentation", label: "Documentation", icon: FileText },
 ];
@@ -69,7 +79,7 @@ export default function ProjectDetailsPage() {
             </div>
           </div>
 
-          {/* 20-Phase SDLC Stepper */}
+          {/* 20-Phase SDLC Progress Bar */}
           <div className="glass-panel p-4 rounded-xl border border-white/10 space-y-3">
             <div className="flex items-center justify-between text-xs font-mono">
               <span className="text-gray-300 font-bold uppercase">SDLC Execution Stepper (20 Phases)</span>
@@ -98,9 +108,9 @@ export default function ProjectDetailsPage() {
             </div>
           </div>
 
-          {/* 12 Specialized Workspace Tabs Bar */}
-          <div className="flex border-b border-white/10 gap-2 overflow-x-auto text-xs font-medium pb-1">
-            {WORKSPACE_TABS.map((tab) => {
+          {/* 18 Specialized Engineering Tabs */}
+          <div className="flex border-b border-white/10 gap-1.5 overflow-x-auto text-xs font-medium pb-2">
+            {WORKSPACE_18_TABS.map((tab) => {
               const Icon = tab.icon;
               return (
                 <button
@@ -119,53 +129,26 @@ export default function ProjectDetailsPage() {
             })}
           </div>
 
-          {/* Tab Workspace Panel */}
-          <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-white/10 min-h-[420px]">
-            {activeTab === "overview" && (
-              <div className="space-y-6 text-xs">
-                <h3 className="text-sm font-bold text-white uppercase font-mono tracking-wider">Project Engineering Matrix</h3>
+          {/* Workspace Tab Panels */}
+          {activeTab === "overview" && (
+            <div className="space-y-6">
+              <TaskBoard />
+              <FileExplorer />
+              <DecisionPanel />
+            </div>
+          )}
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-4 rounded-2xl bg-[#151824] border border-white/5 space-y-1">
-                    <span className="text-gray-400 font-mono text-[10px]">ARCHITECTURE STYLE</span>
-                    <p className="font-semibold text-white">Clean Architecture Modular Monolith</p>
-                  </div>
-                  <div className="p-4 rounded-2xl bg-[#151824] border border-white/5 space-y-1">
-                    <span className="text-gray-400 font-mono text-[10px]">TECH STACK</span>
-                    <p className="font-semibold text-white">Next.js 15, FastAPI, Async SQLAlchemy, Docker</p>
-                  </div>
-                  <div className="p-4 rounded-2xl bg-[#151824] border border-white/5 space-y-1">
-                    <span className="text-gray-400 font-mono text-[10px]">SECURITY AUDIT</span>
-                    <p className="font-semibold text-emerald-400">100% Passed (JWT + RBAC + OWASP)</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3 font-mono">
-                  <h4 className="text-xs font-bold text-gray-300 uppercase">Recent Synthesized Artifacts</h4>
-                  {[
-                    { doc: "Product Requirement Document (PRD v1.0)", author: "Sarah Lin (PM)" },
-                    { doc: "Software Requirement Specification (SRS v1.0)", author: "Sarah Lin (PM)" },
-                    { doc: "3NF Database Schema & ER Graph", author: "David Chen (DB Architect)" }
-                  ].map((item, i) => (
-                    <div key={i} className="p-3 rounded-xl bg-[#151824] border border-white/5 flex items-center justify-between">
-                      <span className="text-gray-200">{item.doc}</span>
-                      <span className="text-indigo-400 text-[10px]">{item.author}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {activeTab !== "overview" && (
-              <div className="flex flex-col items-center justify-center h-64 text-gray-400 text-xs space-y-2">
-                <FileCode2 className="w-8 h-8 text-indigo-400" />
-                <p className="font-mono text-sm font-bold text-white uppercase">
-                  {WORKSPACE_TABS.find((t) => t.id === activeTab)?.label} Workspace
-                </p>
-                <p className="text-gray-400">Deterministic artifact view for Nirman SaaS Core Platform.</p>
-              </div>
-            )}
-          </div>
+          {activeTab !== "overview" && (
+            <div className="glass-panel p-8 rounded-3xl border border-white/10 flex flex-col items-center justify-center min-h-[380px] text-xs font-mono space-y-3">
+              <FileCode2 className="w-10 h-10 text-indigo-400" />
+              <h3 className="text-base font-bold text-white uppercase">
+                {WORKSPACE_18_TABS.find((t) => t.id === activeTab)?.label} Workspace
+              </h3>
+              <p className="text-gray-400 max-w-md text-center">
+                Deterministic artifact specification view for Nirman SaaS Core Platform. Populated automatically by assigned AI agents.
+              </p>
+            </div>
+          )}
         </main>
       </div>
     </div>
