@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { Navbar } from "@/components/layout/Navbar";
+import { Sidebar } from "@/components/dashboard/Sidebar";
+import { TopNavbar } from "@/components/dashboard/TopNavbar";
 import {
   FolderGit2,
   CheckCircle2,
@@ -13,8 +13,28 @@ import {
   Database,
   ShieldCheck,
   Cpu,
-  Play
+  Play,
+  Code2,
+  FileText,
+  Plug,
+  TestTube,
+  Globe
 } from "lucide-react";
+
+const WORKSPACE_TABS = [
+  { id: "overview", label: "Overview", icon: Layers },
+  { id: "requirements", label: "Requirements", icon: FileText },
+  { id: "prd", label: "PRD Spec", icon: FileCode2 },
+  { id: "srs", label: "SRS Spec", icon: FileCode2 },
+  { id: "architecture", label: "Architecture", icon: Layers },
+  { id: "database", label: "Database 3NF", icon: Database },
+  { id: "apis", label: "REST APIs", icon: Plug },
+  { id: "frontend", label: "Frontend", icon: Globe },
+  { id: "backend", label: "Backend", icon: Cpu },
+  { id: "testing", label: "Testing & QA", icon: TestTube },
+  { id: "deployment", label: "Deployment", icon: Terminal },
+  { id: "documentation", label: "Documentation", icon: FileText },
+];
 
 export default function ProjectDetailsPage() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -24,7 +44,7 @@ export default function ProjectDetailsPage() {
       <Sidebar />
 
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        <Navbar />
+        <TopNavbar />
 
         <main className="p-6 max-w-7xl mx-auto w-full space-y-6">
           {/* Project Header */}
@@ -37,19 +57,19 @@ export default function ProjectDetailsPage() {
                 </span>
               </div>
               <p className="text-xs text-gray-400 mt-1">
-                Enterprise AI Software Engineering Platform — Current execution phase: <span className="text-emerald-400 font-mono">Phase 6 (PRD & SRS Specifications)</span>
+                Enterprise AI Software Engineering Platform — Current phase: <span className="text-emerald-400 font-mono">Phase 6 (PRD & SRS Specifications)</span>
               </p>
             </div>
 
             <div className="flex items-center gap-3">
-              <button className="bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs px-4 py-2 rounded-lg shadow-glow transition flex items-center gap-2">
+              <button className="bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs px-4 py-2 rounded-xl shadow-glow transition flex items-center gap-2">
                 <Play className="w-3.5 h-3.5 fill-current" />
                 <span>Execute Next SDLC Phase</span>
               </button>
             </div>
           </div>
 
-          {/* SDLC Stepper Bar (20 Phases preview) */}
+          {/* 20-Phase SDLC Stepper */}
           <div className="glass-panel p-4 rounded-xl border border-white/10 space-y-3">
             <div className="flex items-center justify-between text-xs font-mono">
               <span className="text-gray-300 font-bold uppercase">SDLC Execution Stepper (20 Phases)</span>
@@ -78,52 +98,56 @@ export default function ProjectDetailsPage() {
             </div>
           </div>
 
-          {/* Navigation Tabs */}
-          <div className="flex border-b border-white/10 gap-6 text-xs font-medium">
-            {["overview", "requirements", "architecture", "code", "artifacts", "logs"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`pb-3 capitalize transition border-b-2 ${
-                  activeTab === tab
-                    ? "border-indigo-500 text-indigo-400 font-semibold"
-                    : "border-transparent text-gray-400 hover:text-gray-200"
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
+          {/* 12 Specialized Workspace Tabs Bar */}
+          <div className="flex border-b border-white/10 gap-2 overflow-x-auto text-xs font-medium pb-1">
+            {WORKSPACE_TABS.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-3 py-2 rounded-xl transition flex items-center gap-1.5 whitespace-nowrap border ${
+                    activeTab === tab.id
+                      ? "bg-indigo-600/20 border-indigo-500 text-white font-bold shadow-sm"
+                      : "border-transparent text-gray-400 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Tab Content */}
-          <div className="glass-panel p-6 rounded-2xl border border-white/10 min-h-[400px]">
+          {/* Tab Workspace Panel */}
+          <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-white/10 min-h-[420px]">
             {activeTab === "overview" && (
               <div className="space-y-6 text-xs">
-                <h3 className="text-sm font-bold text-white">Project Overview & Engineering Matrix</h3>
+                <h3 className="text-sm font-bold text-white uppercase font-mono tracking-wider">Project Engineering Matrix</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-4 rounded-xl bg-[#151824] border border-white/5 space-y-1">
+                  <div className="p-4 rounded-2xl bg-[#151824] border border-white/5 space-y-1">
                     <span className="text-gray-400 font-mono text-[10px]">ARCHITECTURE STYLE</span>
                     <p className="font-semibold text-white">Clean Architecture Modular Monolith</p>
                   </div>
-                  <div className="p-4 rounded-xl bg-[#151824] border border-white/5 space-y-1">
+                  <div className="p-4 rounded-2xl bg-[#151824] border border-white/5 space-y-1">
                     <span className="text-gray-400 font-mono text-[10px]">TECH STACK</span>
                     <p className="font-semibold text-white">Next.js 15, FastAPI, Async SQLAlchemy, Docker</p>
                   </div>
-                  <div className="p-4 rounded-xl bg-[#151824] border border-white/5 space-y-1">
+                  <div className="p-4 rounded-2xl bg-[#151824] border border-white/5 space-y-1">
                     <span className="text-gray-400 font-mono text-[10px]">SECURITY AUDIT</span>
                     <p className="font-semibold text-emerald-400">100% Passed (JWT + RBAC + OWASP)</p>
                   </div>
                 </div>
 
                 <div className="space-y-3 font-mono">
-                  <h4 className="text-xs font-bold text-gray-300 uppercase">Recent Synthesized Deliverables</h4>
+                  <h4 className="text-xs font-bold text-gray-300 uppercase">Recent Synthesized Artifacts</h4>
                   {[
                     { doc: "Product Requirement Document (PRD v1.0)", author: "Sarah Lin (PM)" },
                     { doc: "Software Requirement Specification (SRS v1.0)", author: "Sarah Lin (PM)" },
                     { doc: "3NF Database Schema & ER Graph", author: "David Chen (DB Architect)" }
                   ].map((item, i) => (
-                    <div key={i} className="p-3 rounded-lg bg-[#151824] border border-white/5 flex items-center justify-between">
+                    <div key={i} className="p-3 rounded-xl bg-[#151824] border border-white/5 flex items-center justify-between">
                       <span className="text-gray-200">{item.doc}</span>
                       <span className="text-indigo-400 text-[10px]">{item.author}</span>
                     </div>
@@ -133,9 +157,12 @@ export default function ProjectDetailsPage() {
             )}
 
             {activeTab !== "overview" && (
-              <div className="flex flex-col items-center justify-center h-64 text-gray-400 text-xs">
-                <FileCode2 className="w-8 h-8 text-indigo-400 mb-2" />
-                <p className="font-mono">Viewing {activeTab} workspace view for Nirman SaaS Core.</p>
+              <div className="flex flex-col items-center justify-center h-64 text-gray-400 text-xs space-y-2">
+                <FileCode2 className="w-8 h-8 text-indigo-400" />
+                <p className="font-mono text-sm font-bold text-white uppercase">
+                  {WORKSPACE_TABS.find((t) => t.id === activeTab)?.label} Workspace
+                </p>
+                <p className="text-gray-400">Deterministic artifact view for Nirman SaaS Core Platform.</p>
               </div>
             )}
           </div>
