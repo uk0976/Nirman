@@ -4,6 +4,7 @@ from app.agents.pm_agent import pm_agent_instance, PMAgent
 from app.agents.architect_agent import architect_agent_instance, ArchitectAgent
 from app.agents.system_architect_agent import system_architect_agent_instance, SystemArchitectAgent
 from app.agents.db_architect_agent import db_architect_agent_instance, DBArchitectAgent
+from app.agents.ux_designer_agent import ux_designer_agent_instance, UXDesignerAgent
 
 __all__ = [
     "ceo_agent_instance", "CEOAgent",
@@ -11,5 +12,6 @@ __all__ = [
     "pm_agent_instance", "PMAgent",
     "architect_agent_instance", "ArchitectAgent",
     "system_architect_agent_instance", "SystemArchitectAgent",
-    "db_architect_agent_instance", "DBArchitectAgent"
+    "db_architect_agent_instance", "DBArchitectAgent",
+    "ux_designer_agent_instance", "UXDesignerAgent"
 ]
