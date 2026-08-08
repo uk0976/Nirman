@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1 import health, projects, agents, warroom, workflows, artifacts, auth, ceo, ba, pm, architect, system_architect, db_architect, ux_designer, frontend_agent, backend_agent, qa, security, devops, doc_agent, orchestrator
+from app.api.v1 import health, projects, agents, warroom, workflows, artifacts, auth, ceo, ba, pm, architect, system_architect, db_architect, ux_designer, frontend_agent, backend_agent, qa, security, devops, doc_agent, orchestrator, validation
 
 api_router = APIRouter()
 
@@ -21,6 +21,7 @@ api_router.include_router(security.router, prefix="/security-agent", tags=["Secu
 api_router.include_router(devops.router, prefix="/devops", tags=["DevOps Engineer Agent"])
 api_router.include_router(doc_agent.router, prefix="/doc-agent", tags=["Technical Writer & Documentation Agent"])
 api_router.include_router(orchestrator.router, prefix="/orchestrator", tags=["AI Orchestrator Engine"])
+api_router.include_router(validation.router, prefix="/validation", tags=["Production Readiness & Validation"])
 api_router.include_router(warroom.router, prefix="/warroom", tags=["War Room"])
 api_router.include_router(workflows.router, prefix="/workflows", tags=["Workflows"])
 api_router.include_router(artifacts.router, prefix="/artifacts", tags=["Artifacts"])
