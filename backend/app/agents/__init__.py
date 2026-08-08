@@ -7,6 +7,7 @@ from app.agents.db_architect_agent import db_architect_agent_instance, DBArchite
 from app.agents.ux_designer_agent import ux_designer_agent_instance, UXDesignerAgent
 from app.agents.frontend_agent import frontend_agent_instance, FrontendAgent
 from app.agents.backend_agent import backend_agent_instance, BackendAgent
+from app.agents.qa_agent import qa_agent_instance, QAAgent
 
 __all__ = [
     "ceo_agent_instance", "CEOAgent",
@@ -17,5 +18,6 @@ __all__ = [
     "db_architect_agent_instance", "DBArchitectAgent",
     "ux_designer_agent_instance", "UXDesignerAgent",
     "frontend_agent_instance", "FrontendAgent",
-    "backend_agent_instance", "BackendAgent"
+    "backend_agent_instance", "BackendAgent",
+    "qa_agent_instance", "QAAgent"
 ]
