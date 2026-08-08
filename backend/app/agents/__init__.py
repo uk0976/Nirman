@@ -9,6 +9,7 @@ from app.agents.frontend_agent import frontend_agent_instance, FrontendAgent
 from app.agents.backend_agent import backend_agent_instance, BackendAgent
 from app.agents.qa_agent import qa_agent_instance, QAAgent
 from app.agents.security_agent import security_agent_instance, SecurityAgent
+from app.agents.devops_agent import devops_agent_instance, DevOpsAgent
 
 __all__ = [
     "ceo_agent_instance", "CEOAgent",
@@ -21,5 +22,6 @@ __all__ = [
     "frontend_agent_instance", "FrontendAgent",
     "backend_agent_instance", "BackendAgent",
     "qa_agent_instance", "QAAgent",
-    "security_agent_instance", "SecurityAgent"
+    "security_agent_instance", "SecurityAgent",
+    "devops_agent_instance", "DevOpsAgent"
 ]
